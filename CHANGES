@@ -1,3 +1,4 @@
+* Trigger workflow (#1). Thanks @dvora-h
 * 4.1.2 (Jan 27, 2022)
     * Invalid OCSP certificates should raise ConnectionError on failed validation (#1907)
     * Added retry mechanism on socket timeouts when connecting to the server (#1895)
