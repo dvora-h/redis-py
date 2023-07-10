@@ -2,7 +2,7 @@ from json import JSONDecodeError, JSONDecoder, JSONEncoder
 
 import redis
 
-from ..helpers import nativestr
+from ..helpers import get_protocol_version, nativestr
 from .commands import JSONCommands
 from .decoders import bulk_of_jsons, decode_list
 
@@ -38,6 +38,7 @@ class JSON(JSONCommands):
             "JSON.DEBUG": self._decode,
             "JSON.TOGGLE": self._decode,
             "JSON.RESP": self._decode,
+            "JSON.GET": self._decode,
         }
 
         RESP2_MODULE_CALLBACKS = {
@@ -59,19 +60,13 @@ class JSON(JSONCommands):
             "JSON.GET": self._decode,
         }
 
-        RESP3_MODULE_CALLBACKS = {
-            "JSON.GET": lambda response: [
-                [self._decode(r) for r in res] for res in response
-            ]
-            if response
-            else response
-        }
+        RESP3_MODULE_CALLBACKS = {}
 
         self.client = client
         self.execute_command = client.execute_command
         self.MODULE_VERSION = version
 
-        if self.client.connection_pool.connection_kwargs.get("protocol") in ["3", 3]:
+        if get_protocol_version(self.client) in ["3", 3]:
             self.MODULE_CALLBACKS.update(RESP3_MODULE_CALLBACKS)
         else:
             self.MODULE_CALLBACKS.update(RESP2_MODULE_CALLBACKS)
